@@ -8,6 +8,7 @@ import {
 	MessagesSquare,
 } from "lucide-react";
 import { useState } from "react";
+import { usePostHog } from "posthog-js/react";
 
 const SkillCard = ({
 	authorEmail,
@@ -18,10 +19,17 @@ const SkillCard = ({
 	tags,
 	title,
 }: SkillRecord) => {
+	const posthog = usePostHog();
 	const [copied, setCopied] = useState(false);
 
 	async function handleCopy() {
 		await navigator.clipboard.writeText(installCommand);
+		if (
+			import.meta.env.VITE_PUBLIC_POSTHOG_PROJECT_TOKEN &&
+			import.meta.env.VITE_PUBLIC_POSTHOG_HOST
+		) {
+			posthog.capture("skill_install_command_copied");
+		}
 		setCopied(true);
 		setTimeout(() => setCopied(false), 2000);
 	}
