@@ -7,18 +7,20 @@ import {
 	Copy,
 	MessagesSquare,
 } from "lucide-react";
-import { useState } from "react";
 import { usePostHog } from "posthog-js/react";
+import { useState } from "react";
+import type { GetSkillsData } from "#/dataconnect-generated";
+
+type SkillCardProps = GetSkillsData["skills"][number];
 
 const SkillCard = ({
-	authorEmail,
-	category,
 	createdAt,
 	description,
 	installCommand,
 	tags,
 	title,
-}: SkillRecord) => {
+	author,
+}: SkillCardProps) => {
 	const posthog = usePostHog();
 	const [copied, setCopied] = useState(false);
 
@@ -57,9 +59,13 @@ const SkillCard = ({
 			<div className="body">
 				<div className="meta">
 					<div className="author">
-						<img src="/logo512.png" alt="author avatar" className="avatar" />
+						<img
+							src={author.imageUrl ? author.imageUrl : "/logo512.png"}
+							alt="avatar"
+							className="avatar"
+						/>
 						<div className="author-copy">
-							<p>Anil kumar</p>
+							<p>{author.username}</p>
 							<p>
 								{createdAt
 									? new Date(createdAt).toLocaleDateString()
@@ -68,7 +74,7 @@ const SkillCard = ({
 						</div>
 					</div>
 
-					<p className="category">{category}</p>
+					<p className="category">{tags[0] ?? "General"}</p>
 				</div>
 
 				<div className="summary">
@@ -104,7 +110,7 @@ const SkillCard = ({
 
 						<div className="comments">
 							<MessagesSquare size={14} />
-							<span>{authorEmail ? 1 : 0}</span>
+							<span>{author.email ? 1 : 0}</span>
 						</div>
 					</div>
 

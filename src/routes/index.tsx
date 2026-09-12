@@ -1,78 +1,99 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
 import { Terminal } from "lucide-react";
 import SkillCard from "#/components/SkillCard";
+import { getSkills } from "#/dataconnect-generated";
+import { dataConnect } from "#/lib/firebase";
 
-export const Route = createFileRoute("/")({ component: Home });
+const getSkillsFn = createServerFn({ method: "GET" }).handler(async () => {
+	try {
+		const { data } = await getSkills(dataConnect, {
+			limit: 10,
+			searchTerm: " ",
+		});
+
+		return data.skills;
+	} catch (error) {
+		console.log(error);
+		return [];
+	}
+});
+
+export const Route = createFileRoute("/")({
+	component: Home,
+	loader: () => getSkillsFn(),
+});
 
 const dummySkills: SkillRecord[] = [
 	{
-		id: "skill_001",
-		title: "API Testing Assistant",
-		slug: "api-testing-assistant",
+		id: "skill-001",
+		title: "Write Code",
+		slug: "write-code",
 		description:
-			"Helps generate API test cases, validate responses, and troubleshoot common REST API issues.",
+			"Generate clean TypeScript snippets and scaffold common app patterns.",
 		category: "Development",
-		tags: ["api", "testing", "rest", "postman"],
-		installCommand: "npx skills add api-testing-assistant",
-		createdAt: "2026-08-15T10:30:00.000Z",
-		authorClerkId: "user_2xA7kLm91",
-		authorEmail: "alex@example.com",
+		tags: ["typescript", "react", "boilerplate"],
+		installCommand: "npx skild add write-code",
+		createdAt: "2026-04-14T09:30:00.000Z",
+		authorClerkId: "user_2a1b3c4d",
+		authorEmail: "dev1@example.com",
 	},
 	{
-		id: "skill_002",
-		title: "Git Commit Helper",
-		slug: "git-commit-helper",
+		id: "skill-002",
+		title: "Refactor Safely",
+		slug: "refactor-safely",
 		description:
-			"Creates clear and conventional Git commit messages from staged changes.",
-		category: "Developer Tools",
-		tags: ["git", "commits", "conventional-commits", "developer-tools"],
-		installCommand: "npx skills add git-commit-helper",
-		createdAt: "2026-08-18T14:45:00.000Z",
-		authorClerkId: "user_8QpLm42Zx",
-		authorEmail: "jordan@example.com",
+			"Improve structure while preserving behavior with focused, low-risk edits.",
+		category: "Code Quality",
+		tags: ["refactor", "maintainability", "clean-code"],
+		installCommand: "npx skild add refactor-safely",
+		createdAt: "2026-04-14T09:45:00.000Z",
+		authorClerkId: "user_5e6f7g8h",
+		authorEmail: "dev2@example.com",
 	},
 	{
-		id: "skill_003",
-		title: "Database Query Optimizer",
-		slug: "database-query-optimizer",
+		id: "skill-003",
+		title: "Test Coverage Boost",
+		slug: "test-coverage-boost",
 		description:
-			"Analyzes SQL queries and suggests indexes, joins, and query structure improvements.",
-		category: "Database",
-		tags: ["sql", "database", "postgresql", "optimization"],
-		installCommand: "npx skills add database-query-optimizer",
-		createdAt: "2026-08-22T09:15:00.000Z",
-		authorClerkId: "user_4Rt91NvXk",
-		authorEmail: "sam@example.com",
+			"Create unit and integration test cases for edge paths and regressions.",
+		category: "Testing",
+		tags: ["vitest", "testing-library", "coverage"],
+		installCommand: "npx skild add test-coverage-boost",
+		createdAt: "2026-04-14T10:00:00.000Z",
+		authorClerkId: "user_9i0j1k2l",
+		authorEmail: "dev3@example.com",
 	},
 	{
-		id: "skill_004",
-		title: "Technical Documentation Writer",
-		slug: "technical-documentation-writer",
+		id: "skill-004",
+		title: "API Contract Builder",
+		slug: "api-contract-builder",
 		description:
-			"Generates concise technical documentation for APIs, libraries, configuration files, and developer workflows.",
-		category: "Documentation",
-		tags: ["documentation", "markdown", "api-docs", "writing"],
-		installCommand: "npx skills add technical-documentation-writer",
-		createdAt: null,
-		authorClerkId: null,
-		authorEmail: null,
+			"Draft typed request and response contracts for REST endpoints.",
+		category: "Backend",
+		tags: ["api", "zod", "contracts"],
+		installCommand: "npx skild add api-contract-builder",
+		createdAt: "2026-04-14T10:15:00.000Z",
+		authorClerkId: "user_3m4n5o6p",
+		authorEmail: "dev4@example.com",
 	},
 	{
-		id: "skill_005",
-		title: "React Component Builder",
-		slug: "react-component-builder",
+		id: "skill-005",
+		title: "Performance Tuner",
+		slug: "performance-tuner",
 		description:
-			"Creates reusable React components with accessible markup, sensible props, and modern TypeScript patterns.",
-		category: "Frontend",
-		tags: ["react", "typescript", "components", "frontend", "accessibility"],
-		installCommand: "npx skills add react-component-builder",
-		createdAt: "2026-09-01T16:20:00.000Z",
-		authorClerkId: "user_7Yk31PqLm",
-		authorEmail: "taylor@example.com",
+			"Identify render bottlenecks and optimize expensive client-side work.",
+		category: "Optimization",
+		tags: ["profiling", "memoization", "web-vitals"],
+		installCommand: "npx skild add performance-tuner",
+		createdAt: "2026-04-14T10:30:00.000Z",
+		authorClerkId: "user_7q8r9s0t",
+		authorEmail: "dev5@example.com",
 	},
 ];
 
 function Home() {
+	const skills = Route.useLoaderData();
 	return (
 		<div id="home">
 			<section className="hero">
@@ -111,9 +132,9 @@ function Home() {
 				</div>
 
 				<div>
-					{dummySkills.length > 0 ? (
+					{skills.length > 0 ? (
 						<div className="skills-grid">
-							{dummySkills.map((skill) => (
+							{skills.map((skill) => (
 								<SkillCard key={skill.id} {...skill} />
 							))}
 						</div>
